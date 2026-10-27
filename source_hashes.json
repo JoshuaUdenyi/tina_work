@@ -1,0 +1,5 @@
+{
+  "src/models/proposed.py": "c97ede1bd4d3c5ac61173a18813a210084fbc98e0d99c8f89e6a9a61b31b0f49",
+  "src/augment/degradations.py": "448332eae1cae4e0f177c5c668fa3247bdf43fb626393b71396c6978cf478ad3",
+  "src/models/baselines.py": "c1073f303241bef5b3c3be5dafa4d2f6fe1e496def229eaba14691ad0aff5af8"
+}

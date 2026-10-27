@@ -1,0 +1,91 @@
+# Default training configuration — Chapter 3 methodology
+# Edit this file or override via CLI flags in scripts/train.py
+
+dataset:
+  name: GTSRB
+  root: data/GTSRB              # after running scripts/download_gtsrb.py
+  img_size: 64                   # 64x64 per Section 3.4
+  num_classes: 43
+  split:                         # Section 3.3 — track-aware, stratified
+    train: 0.70
+    val: 0.15
+    test: 0.15
+    seed: 42
+    track_group_size: 30         # approx frames per physical sign
+    stratify: true
+
+preprocess:
+  normalize: [0, 1]              # pixel range
+  one_hot: true
+  augment_clean:                 # Section 3.4 — baseline augmentation (not degradation)
+    rotation_deg: 15
+    zoom_range: 0.10
+    width_shift: 0.10
+    height_shift: 0.10
+
+# Section 3.5 — degradation simulation (Table 3.1)
+# Low-light convention (Fix #2): out = in^(1/gamma) with gamma in {0.7, 0.5, 0.3}.
+# Since gamma < 1, exponent 1/gamma > 1 and the image darkens.
+# Equivalent to out = in^γ' with γ' = {1.43, 2.0, 3.33} under the opposite convention.
+degradations:
+  fog:
+    method: atmospheric_scattering
+    severities: [light, moderate, heavy]
+    fog_alpha: [0.30, 0.55, 0.75]
+  motion_blur:
+    method: linear_kernel
+    severities: [5, 9, 15]       # kernel size px, random angle per image
+  low_light:
+    method: gamma_darkening
+    formula: "out = in^(1/gamma)"  # explicit convention — see Fix #2
+    gamma: [0.7, 0.5, 0.3]        # <1 darkens under this convention
+    brightness_scale: [0.90, 0.75, 0.60]  # additional linear dimming per severity
+  gaussian_noise:
+    method: additive_gaussian
+    severities: [0.02, 0.05, 0.10] # sigma
+  rain:
+    method: directional_streak_overlay
+    severities: [light, moderate, heavy]
+    streak_count: [40, 90, 160]
+  occlusion:
+    method: random_rect_mask
+    severities: [0.10, 0.25, 0.40] # fraction of sign area masked
+
+training:
+  degradation_aware: true        # false = clean-only ablation (Fix #3)
+  clean_ratio: 0.5               # fraction of each batch kept clean when aware=true
+  batch_size: 64
+  epochs: 50
+  optimizer: adam
+  lr: 0.001
+  lr_decay_factor: 0.5
+  lr_patience: 3
+  early_stop_patience: 7
+  dropout: 0.30
+  mixed_precision: false
+
+model:
+  name: proposed                # proposed | mobilenetv2 | squeezenet
+  input_shape: [64, 64, 3]
+  filters: [32, 64, 128, 256]   # Section 3.6 — four DS blocks
+  activation: relu6
+  use_batchnorm: true
+
+evaluation:
+  metrics: [accuracy, precision, recall, f1]
+  robustness_score: mean_degraded_over_clean  # Section 3.8(iii)
+  per_degradation: true
+  per_severity: true
+  efficiency:
+    count_params: true
+    measure_latency: true
+    latency_runs: 200
+
+reproducibility:
+  seed: 42
+  deterministic: false           # set true for exact reproducibility (slower)
+
+paths:
+  checkpoints: checkpoints
+  logs: logs
+  results: results

@@ -1,0 +1,16 @@
+{
+  "source": "Archived evaluation JSON files from the user supplied Tina (3).zip",
+  "checks": [
+    "proposed_aware: counts, clean accuracy, 18-condition mean and R are consistent.",
+    "proposed_clean_only: counts, clean accuracy, 18-condition mean and R are consistent.",
+    "mobilenetv2_aware: counts, clean accuracy, 18-condition mean and R are consistent.",
+    "squeezenet_aware: counts, clean accuracy, 18-condition mean and R are consistent."
+  ],
+  "files": {
+    "results/proposed_aware/eval.json": "0cde54bf03449ca1d192c4a6d77e362aee9cdd68494b353f866ec4b0483bd9f6",
+    "results/proposed_clean_only/eval.json": "8b42fb111c9e3265b71c384d989283a650ddf387ea71d43cf487b3fdc3cbc3a1",
+    "results/mobilenetv2_aware/eval.json": "23314e8c6f95132e0c7e7337c00238b06f2d1cc6be3a5529342a7ac265c5f5de",
+    "results/squeezenet_aware/eval.json": "8d35f717e5589dc7d2c3706222ae519579416931d06c8650200d8b7d6d76d865"
+  },
+  "new_inference": false
+}
